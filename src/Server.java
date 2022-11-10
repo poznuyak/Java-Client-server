@@ -1,3 +1,5 @@
+import poznyak.Phone;
+
 import javax.imageio.IIOException;
 import java.io.*;
 import java.net.ServerSocket;
@@ -10,19 +12,18 @@ public class Server {
 
         try( ServerSocket server = new ServerSocket(8000);){
             System.out.println("server started!");
-            try(
-                    Socket socket = server.accept(); // ожидание подключения клиента
-                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))
-                    )
+            while (true)
+            try(Phone phone = new Phone(server))
             {
-                String request = reader.readLine();
+                new Thread(() ->{}).start();
+                String request = phone.readLine();
                 System.out.println("Request: " + request);
-                String response = "hello from server!" + request.length();
+                String response = (int) (Math.random() * 30 - 10) + "";
+                Thread.sleep(4000);
+                phone.writeLine(response);
                 System.out.println("Response: " + response);
-                writer.write(response);
-                writer.newLine();
-                writer.flush();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
 
         } catch (IOException e){
